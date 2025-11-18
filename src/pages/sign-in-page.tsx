@@ -6,20 +6,32 @@ import { Link } from "react-router";
 import gitHubLogo from "@/assets/github-mark.svg";
 import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth";
 import { toast } from "sonner";
+import { generateErrorMessage } from "@/lib/error";
+import kakaoLogo from "@/assets/btn_kakao.svg";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate: signInWithPassword } = useSignInWithPassword({
-    onError: (error) => {
-      toast.error(error.message, {
-        position: "top-center",
-      });
+  const { mutate: signInWithPassword, isPending: isSignInWithPasswordPending } =
+    useSignInWithPassword({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
+        toast.error(message, {
+          position: "top-center",
+        });
 
-      setPassword("");
-    },
-  });
-  const { mutate: signInWithOAuth } = useSignInWithOAuth();
+        setPassword("");
+      },
+    });
+  const { mutate: signInWithOAuth, isPending: isSignInWithOAuthPending } =
+    useSignInWithOAuth({
+      onError: (error) => {
+        const messasge = generateErrorMessage(error);
+        toast.error(messasge, {
+          position: "top-center",
+        });
+      },
+    });
 
   const handleSignInWithPasswordClick = () => {
     if (email.trim() === "") return;
@@ -31,15 +43,27 @@ export default function SignInPage() {
     });
   };
 
-  const handleSignInWithOAuthClick = () => {
+  const handleSignInWithGitHubClick = () => {
     signInWithOAuth("github");
   };
+  const handleSignInWithKakaoClick = async () => {
+    try {
+      const res = await signInWithOAuth("kakao");
+      console.log("Kakao OAuth Response:", res);
+    } catch (error) {
+      console.error("Kakao OAuth Error:", error);
+    }
+    signInWithOAuth("kakao");
+  };
+
+  const isPending = isSignInWithOAuthPending || isSignInWithPasswordPending;
 
   return (
     <div className="flex flex-col gap-8">
       <div className="text-xl font-bold">로그인</div>
       <div className="flex flex-col gap-2">
         <Input
+          disabled={isPending}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="py-6"
@@ -47,6 +71,7 @@ export default function SignInPage() {
           placeholder="example@abc.com"
         />
         <Input
+          disabled={isPending}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="py-6"
@@ -55,19 +80,34 @@ export default function SignInPage() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Button onClick={handleSignInWithPasswordClick} className="w-full">
+        <Button
+          disabled={isPending}
+          onClick={handleSignInWithPasswordClick}
+          className="w-full"
+        >
           로그인
         </Button>
         <Button
-          onClick={handleSignInWithOAuthClick}
+          disabled={isPending}
+          onClick={handleSignInWithGitHubClick}
           className="w-full"
           variant={"outline"}
         >
           <img src={gitHubLogo} className="h-4 w-4" />
           GitHub 계정으로 로그인
         </Button>
+        <Button
+          disabled={isPending}
+          onClick={handleSignInWithKakaoClick}
+          className="w-full bg-[#FEE500] text-[#3C1E1E] hover:bg-[#FADA0A]"
+          variant={"outline"}
+        >
+          <img src={kakaoLogo} className="h-8 w-8" />
+          KakaoTalk 계정으로 로그인
+        </Button>
       </div>
       <div>
+        disabled={isPending}
         <Link className="text-muted-foreground hover:underline" to={"/sign-up"}>
           계정이 없으시다면? 회원가입
         </Link>

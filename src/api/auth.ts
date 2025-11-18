@@ -35,8 +35,18 @@ export async function signInWithPassword({
 }
 
 export async function signInWithOAuth(provider: Provider) {
+  const options =
+    provider === "kakao"
+      ? {
+          redirectTo: window.location.origin,
+          scopes: "profile_nickname profile_image", //  Kakao 전용 스코프
+        }
+      : {
+          redirectTo: window.location.origin,
+        };
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
+    options,
   });
 
   if (error) throw error;
