@@ -7,6 +7,7 @@ import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
 import { toast } from "sonner";
 import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
 import { useSession } from "@/store/session";
+import { useOpenAlertModal } from "@/store/alert-modal";
 
 type Image = {
   file: File;
@@ -15,12 +16,13 @@ type Image = {
 
 export default function PostEditorModal() {
   const session = useSession();
+  const { isOpen, close } = usePostEditorModal();
+  const openAlertModal = useOpenAlertModal();
+
   const [content, setContent] = useState("");
   const [images, setImages] = useState<Image[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { isOpen, close } = usePostEditorModal();
 
   const { mutate: createPost, isPending: isCreatePostPending } = useCreatePost({
     onSuccess: () => {
@@ -40,6 +42,16 @@ export default function PostEditorModal() {
   };
 
   const handleCloseModal = () => {
+    if (content !== "" || images.length !== 0) {
+      openAlertModal({
+        title: "게시글 작성이 마무리 되지 않았습니다",
+        description: "이 화면에서 나가면 작성중이던 내용이 사라집니다",
+        onPositive: () => {
+          close();
+        },
+      });
+      return;
+    }
     close();
   };
 
