@@ -35,10 +35,31 @@ export default function PostEditorModal() {
     },
   });
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      images.forEach((image) => {
+        URL.revokeObjectURL(image.previewUrl);
+      });
+      return;
+    }
+    textareaRef.current?.focus();
+    setContent("");
+    setImages([]);
+  }, [isOpen]);
+
   const handleDeleteImage = (image: Image) => {
     setImages((prevImages) =>
       prevImages.filter((item) => item.previewUrl !== image.previewUrl),
     );
+    URL.revokeObjectURL(image.previewUrl);
   };
 
   const handleCloseModal = () => {
@@ -78,20 +99,6 @@ export default function PostEditorModal() {
     e.target.value = "";
   };
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + "px";
-    }
-  });
-
-  useEffect(() => {
-    if (!isOpen) return;
-    textareaRef.current?.focus();
-    setContent("");
-    setImages([]);
-  }, [isOpen]);
   return (
     <Dialog open={isOpen} onOpenChange={handleCloseModal}>
       <DialogContent className="max-h-[90vh]">
