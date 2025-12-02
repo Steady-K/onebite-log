@@ -1,5 +1,5 @@
 import supabase from "@/lib/supabase";
-import { deleteImages, uploadImage } from "./images";
+import { deleteImages, uploadImage } from "./image";
 import type { PostEntity } from "@/types";
 
 export async function fetchPosts({ from, to }: { from: number; to: number }) {
