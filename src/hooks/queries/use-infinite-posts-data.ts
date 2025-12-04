@@ -24,5 +24,6 @@ export function useInfiniteQueryData() {
       if (lastPage.length < PAGE_SIZE) return undefined;
       return allPage.length;
     },
+    staleTime: Infinity,
   });
 }
