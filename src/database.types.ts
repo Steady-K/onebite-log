@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      Like: {
+      like: {
         Row: {
           created_at: string
           id: number
