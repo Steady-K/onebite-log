@@ -8,7 +8,7 @@ export function usePostByIdData({
   type,
 }: {
   postId: number;
-  type: "FEED" | "DETALE";
+  type: "FEED" | "DETAIL";
 }) {
   const session = useSession();
 
